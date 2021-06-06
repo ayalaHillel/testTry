@@ -1,0 +1,153 @@
+{\rtf1\fbidis\ansi\ansicpg1255\deff0\nouicompat\deflang1037{\fonttbl{\f0\fnil\fcharset0 Arial;}{\f1\fnil\fcharset177 Arial;}}
+{\*\generator Riched20 10.0.19041}\viewkind4\uc1 
+\pard\rtlpar\sa200\sl276\slmult1\qr\fs20\lang1033 crop\f1\rtlch\lang1037\par
+\f0\ltrch\lang1033 import React, \{ useState, useCallback, useEffect \} from "react\f1\rtlch\lang1037 ";\par
+\f0\ltrch\lang1033 import \{ useDispatch \} from "react-redux\f1\rtlch\lang1037 ";\par
+\f0\ltrch\lang1033 import \{ actions \} from "../../../../redux/actions\f1\rtlch\lang1037 ";\par
+\f0\ltrch\lang1033 import ReactDOM from 'react-dom\f1\rtlch\lang1037 '\par
+\f0\ltrch\lang1033 import Cropper from 'react-easy-crop\f1\rtlch\lang1037 '\par
+\f0\ltrch\lang1033 import Slider from '@material-ui/core/Slider\f1\rtlch\lang1037 '\par
+\f0\ltrch\lang1033 import Button from '@material-ui/core/Button\f1\rtlch\lang1037 '\par
+\f0\ltrch\lang1033 import \{ Modal \} from "react-bootstrap\f1\rtlch\lang1037 ";\par
+\f0\ltrch\lang1033 import Typography from '@material-ui/core/Typography\f1\rtlch\lang1037 '\par
+\f0\ltrch\lang1033 import \{ withStyles \} from '@material-ui/core/styles\f1\rtlch\lang1037 '\par
+\f0\ltrch\lang1033 import ImgDialog from './ImgDialog\f1\rtlch\lang1037 '\par
+\f0\ltrch\lang1033 import getCroppedImg from './cropImage\f1\rtlch\lang1037 '\par
+\f0\ltrch\lang1033 import \{ styles \} from './styles\f1\rtlch\lang1037 '\par
+\f0\ltrch\lang1033 import \{ FontAwesomeIcon \} from "@fortawesome/react-fontawesome\f1\rtlch\lang1037 ";\par
+\par
+\f0\ltrch\lang1033 import '../RecordDetails.css\f1\rtlch\lang1037 '\par
+\par
+\f0\ltrch\lang1033 export const Demo = (props)\f1\rtlch\lang1037  => \{\par
+    \f0\ltrch\lang1033 const dispatch = useDispatch\f1\rtlch\lang1037 ()\par
+    \f0\ltrch\lang1033 const classes = props.classes\f1\rtlch\lang1037\par
+    \f0\ltrch\lang1033 const selectedImg = props.id\f1\rtlch\lang1037\par
+    \f0\ltrch\lang1033 const [crop, setCrop] = useState(props.crop)\f1\rtlch\lang1037\par
+    \f0\ltrch\lang1033 const [rotation, setRotation] = useState(props.rotation)\f1\rtlch\lang1037\par
+    \f0\ltrch\lang1033 const [zoom, setZoom] = useState(props.zoom)\f1\rtlch\lang1037\par
+    \f0\ltrch\lang1033 const [croppedAreaPixels, setCroppedAreaPixels] = useState(props.croppedAreaPixels)\f1\rtlch\lang1037\par
+    \f0\ltrch\lang1033 const [croppedImage, setCroppedImage] = useState(null)\f1\rtlch\lang1037\par
+    \f0\ltrch\lang1033 const onCropComplete = useCallback((croppedArea, croppedAreaPixels\f1\rtlch\lang1037 ) => \{\par
+        \f0\ltrch\lang1033 setCroppedAreaPixels(croppedAreaPixels)\f1\rtlch\lang1037\par
+    \}, [])\par
+    \f0\ltrch\lang1033 const savaCroppedImage = useCallback(async\f1\rtlch\lang1037  () => \{\par
+        \f0\ltrch\lang1033 try\f1\rtlch\lang1037  \{\par
+            \f0\ltrch\lang1033 const croppedImage = await getCroppedImg\f1\rtlch\lang1037 (\par
+                \f0\ltrch\lang1033 selectedImg\f1\rtlch\lang1037 ,\par
+                \f0\ltrch\lang1033 croppedAreaPixels\f1\rtlch\lang1037 ,\par
+                \f0\ltrch\lang1033 rotation\f1\rtlch\lang1037\par
+            )\par
+            \f0\ltrch\lang1033 console.log('donee', \{ croppedImage \})\f1\rtlch\lang1037\par
+            \f0\ltrch\lang1033 setCroppedImage(croppedImage)\f1\rtlch\lang1037\par
+            \f0\ltrch\lang1033 if (props.source === "singleAudio")\f1\rtlch\lang1037  \{\par
+                \f0\ltrch\lang1033 dispatch(actions.changeCurrentAudioImage(\{ imgUrl: croppedImage \}))\f1\rtlch\lang1037\par
+            \}\par
+            \f0\ltrch\lang1033 else\f1\rtlch\lang1037  \{\par
+                \f0\ltrch\lang1033 dispatch(actions.setImage(\{ file: props.file, url: croppedImage, key: props.img \}))\f1\rtlch\lang1037 ;\par
+            \}\par
+            \f0\ltrch\lang1033 props.Cb(false, selectedImg, zoom, rotation, croppedAreaPixels, crop)\f1\rtlch\lang1037\par
+\par
+        \}\par
+        \f0\ltrch\lang1033 catch (e)\f1\rtlch\lang1037  \{\par
+            \f0\ltrch\lang1033 console.error(e)\f1\rtlch\lang1037\par
+        \}\par
+    \}, [\f0\ltrch\lang1033 croppedAreaPixels\f1\rtlch\lang1037 ])\par
+\par
+    \f0\ltrch\lang1033 const onClose = useCallback\f1\rtlch\lang1037 (() => \{\par
+        \f0\ltrch\lang1033 setCroppedImage(null)\f1\rtlch\lang1037 ;\par
+    \}, []);\par
+\f0\ltrch\lang1033 function Show\f1\rtlch\lang1037 () \{\par
+    \f0\ltrch\lang1033 props.ShowCropperInClose(false)\f1\rtlch\lang1037\par
+\}\par
+    \f0\ltrch\lang1033 return\f1\rtlch\lang1037  (\par
+        <\f0\ltrch\lang1033 div className="Crop\f1\rtlch\lang1037 ">\par
+            <\f0\ltrch\lang1033 Modal.Dialog style=\{\{ width: "100%", backgroundColor: "transparent !important" \}\}\f1\rtlch\lang1037 >\par
+                <\f0\ltrch\lang1033 Modal.Header closeButton onHide=\{Show\} ></Modal.Header\f1\rtlch\lang1037 >\par
+                <\f0\ltrch\lang1033 Modal.Body style=\{\{ backgroundColor: "transparent !important" \}\}\f1\rtlch\lang1037 >\par
+                    <\f0\ltrch\lang1033 div style=\{\{ backgroundColor: "transparent !important" \}\} className=\{classes.cropContainer\}\f1\rtlch\lang1037 >\par
+                        <\f0\ltrch\lang1033 Cropper\f1\rtlch\lang1037\par
+                            \f0\ltrch\lang1033 image=\{selectedImg\}\f1\rtlch\lang1037\par
+                            \f0\ltrch\lang1033 crop=\{crop\}\f1\rtlch\lang1037\par
+                            \f0\ltrch\lang1033 rotation=\{rotation\}\f1\rtlch\lang1037\par
+                            \f0\ltrch\lang1033 zoom=\{zoom\}\f1\rtlch\lang1037\par
+                            \f0\ltrch\lang1033 aspect\f1\rtlch\lang1037 =\{\f0\ltrch\lang1033 6\f1\rtlch\lang1037  / \f0\ltrch\lang1033 1.5\f1\rtlch\lang1037\}\par
+                            \f0\ltrch\lang1033 onCropChange=\{setCrop\}\f1\rtlch\lang1037\par
+                            \f0\ltrch\lang1033 onRotationChange=\{setRotation\}\f1\rtlch\lang1037\par
+                            \f0\ltrch\lang1033 onCropComplete=\{onCropComplete\}\f1\rtlch\lang1037\par
+                            \f0\ltrch\lang1033 onZoomChange=\{setZoom\}\f1\rtlch\lang1037\par
+                        />\par
+                    </\f0\ltrch\lang1033 div\f1\rtlch\lang1037 >\par
+                    <\f0\ltrch\lang1033 div className=\{classes.controls\}\f1\rtlch\lang1037 >\par
+                        <\f0\ltrch\lang1033 div\f1\rtlch\lang1037\par
+                            \f0\ltrch\lang1033 className=\{classes.sliderContainer\}\f1\rtlch\lang1037\par
+                        >\par
+                            <\f0\ltrch\lang1033 Typography\f1\rtlch\lang1037\par
+                                \f0\ltrch\lang1033 style=\{\{ width: "56%" \}\}\f1\rtlch\lang1037\par
+                                \f0\ltrch\lang1033 variant="overline\f1\rtlch\lang1037 "\par
+                                \f0\ltrch\lang1033 classes=\{\{ root: classes.sliderLabel \}\}\f1\rtlch\lang1037\par
+                            >\par
+                                \f0\ltrch\lang1033 Zoom\f1\rtlch\lang1037\par
+          </\f0\ltrch\lang1033 Typography\f1\rtlch\lang1037 >\par
+                            <\f0\ltrch\lang1033 Slider\f1\rtlch\lang1037\par
+                                \f0\ltrch\lang1033 value=\{zoom\}\f1\rtlch\lang1037\par
+                                \f0\ltrch\lang1033 min\f1\rtlch\lang1037 =\{\f0\ltrch\lang1033 1\f1\rtlch\lang1037\}\par
+                                \f0\ltrch\lang1033 max\f1\rtlch\lang1037 =\{\f0\ltrch\lang1033 3\f1\rtlch\lang1037\}\par
+                                \f0\ltrch\lang1033 step\f1\rtlch\lang1037 =\{\f0\ltrch\lang1033 0.1\f1\rtlch\lang1037\}\par
+                                \f0\ltrch\lang1033 aria-labelledby="Zoom\f1\rtlch\lang1037 "\par
+                                \f0\ltrch\lang1033 classes=\{\{ root: classes.slider \}\}\f1\rtlch\lang1037\par
+                                \f0\ltrch\lang1033 onChange=\{(e, zoom) => setZoom(zoom)\}\f1\rtlch\lang1037\par
+                            />\par
+                        </\f0\ltrch\lang1033 div\f1\rtlch\lang1037 >\par
+                        <\f0\ltrch\lang1033 div className=\{classes.sliderContainer\}\f1\rtlch\lang1037 >\par
+                            <\f0\ltrch\lang1033 Typography\f1\rtlch\lang1037\par
+                                \f0\ltrch\lang1033 variant="overline\f1\rtlch\lang1037 "\par
+                                \f0\ltrch\lang1033 classes=\{\{ root: classes.sliderLabel \}\}\f1\rtlch\lang1037\par
+                                \f0\ltrch\lang1033 style=\{\{ width: "56%" \}\}\f1\rtlch\lang1037\par
+                                \f0\ltrch\lang1033 className="slider\f1\rtlch\lang1037 "\par
+                            >\par
+                                \f0\ltrch\lang1033 Rotation\f1\rtlch\lang1037\par
+          </\f0\ltrch\lang1033 Typography\f1\rtlch\lang1037 >\par
+                            <\f0\ltrch\lang1033 Slider\f1\rtlch\lang1037\par
+                                \f0\ltrch\lang1033 value=\{rotation\}\f1\rtlch\lang1037\par
+                                \f0\ltrch\lang1033 min\f1\rtlch\lang1037 =\{\f0\ltrch\lang1033 0\f1\rtlch\lang1037\}\par
+                                \f0\ltrch\lang1033 max\f1\rtlch\lang1037 =\{\f0\ltrch\lang1033 360\f1\rtlch\lang1037\}\par
+                                \f0\ltrch\lang1033 step\f1\rtlch\lang1037 =\{\f0\ltrch\lang1033 1\f1\rtlch\lang1037\}\par
+                                \f0\ltrch\lang1033 aria-labelledby="Rotation\f1\rtlch\lang1037 "\par
+                                \f0\ltrch\lang1033 classes=\{\{ root: classes.slider \}\}\f1\rtlch\lang1037\par
+                                \f0\ltrch\lang1033 onChange=\{(e, rotation) => setRotation(rotation)\}\f1\rtlch\lang1037\par
+                            />\par
+                        </\f0\ltrch\lang1033 div\f1\rtlch\lang1037 >\par
+                    </\f0\ltrch\lang1033 div\f1\rtlch\lang1037 >\par
+                    <\f0\ltrch\lang1033 ImgDialog img=\{croppedImage\} onClose=\{onClose\}\f1\rtlch\lang1037  />\par
+                   \par
+                    <\f0\ltrch\lang1033 button\f1\rtlch\lang1037\par
+                    \f0\ltrch\lang1033 className="buttonCrop\f1\rtlch\lang1037 "\par
+                    \f0\ltrch\lang1033 classes=\{\{ root: classes.cropButton \}\}\f1\rtlch\lang1037\par
+                    \f0\ltrch\lang1033 style=\{\{ backgroundColor: "white", variant: "contained", color: "#4B0083" \}\}\f1\rtlch\lang1037 >\par
+                        <\f0\ltrch\lang1033 input type="file" name="file" accept="image/*" id=\{`currentAudioImgFile`\}   className="inputfile inputfilecrop " onChange=\{(e) => props.changeImage(e.target.files[0])\}\f1\rtlch\lang1037 />\par
+                        <\f0\ltrch\lang1033 label htmlFor=\{`currentAudioImgFile`\} className=" inputfilecrop " style=\{\{ width: "100%", margin: "0px !important" \}\}\f1\rtlch\lang1037 >\par
+                            \{/* <\f0\ltrch\lang1033 div className=" wrapIconUpload\f1\rtlch\lang1037 "> */\}\par
+                    \f0\ltrch\lang1033 Upload image\f1\rtlch\lang1037\par
+                        \{/* </\f0\ltrch\lang1033 div\f1\rtlch\lang1037 > */\}\par
+                        </\f0\ltrch\lang1033 label\f1\rtlch\lang1037 >\par
+                    </\f0\ltrch\lang1033 button\f1\rtlch\lang1037 >\par
+                    <\f0\ltrch\lang1033 button\f1\rtlch\lang1037\par
+                        \f0\ltrch\lang1033 onClick=\{savaCroppedImage\}\f1\rtlch\lang1037\par
+                        \f0\ltrch\lang1033 style=\{\{ backgroundColor: "#4B0083", variant: "contained", color: "white" \}\}\f1\rtlch\lang1037\par
+                        \f0\ltrch\lang1033 className="buttonCrop\f1\rtlch\lang1037 "\par
+                        \f0\ltrch\lang1033 classes=\{\{ root: classes.cropButton \}\}\f1\rtlch\lang1037\par
+                    >\par
+                        \f0\ltrch\lang1033 Save\f1\rtlch\lang1037\par
+                    </\f0\ltrch\lang1033 button\f1\rtlch\lang1037 >\par
+                </\f0\ltrch\lang1033 Modal.Body\f1\rtlch\lang1037 >\par
+            </\f0\ltrch\lang1033 Modal.Dialog\f1\rtlch\lang1037 >\par
+\par
+        </\f0\ltrch\lang1033 div\f1\rtlch\lang1037 >\par
+    )\par
+\}\par
+\f0\ltrch\lang1033 export default withStyles(styles)(Demo)\f1\rtlch\lang1037\par
+\par
+// \f0\ltrch\lang1033 const rootElement = document.getElementById('root')\f1\rtlch\lang1037\par
+// \f0\ltrch\lang1033 ReactDOM.render(<StyledDemo />, rootElement)\par
+}
+ 
