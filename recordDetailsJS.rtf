@@ -1,0 +1,265 @@
+{\rtf1\fbidis\ansi\ansicpg1255\deff0\nouicompat\deflang1037{\fonttbl{\f0\fnil\fcharset0 Calibri;}{\f1\fnil\fcharset177 Calibri;}{\f2\fnil Calibri;}}
+{\*\generator Riched20 10.0.19041}\viewkind4\uc1 
+\pard\rtlpar\sa200\sl276\slmult1\qr\f0\fs22\lang1033 import React, \{ useEffect, useState \} from "react\f1\rtlch\lang1037 ";\par
+\f0\ltrch\lang1033 import \{ connect \} from "react-redux\f1\rtlch\lang1037 ";\par
+\f0\ltrch\lang1033 import \{ BackgroundColor \} from '../ElementsWithStyledComponent\f1\rtlch\lang1037 ';\par
+\f0\ltrch\lang1033 import defaultImgSrc from '../../../assets/defaultImg.png\f1\rtlch\lang1037 ';\par
+\f0\ltrch\lang1033 import CreateDateViewsCommentsWithIcons from '../CreateDateViewsCommentsWithIcons/createDateViewsCommentsWithIcons\f1\rtlch\lang1037 ';\par
+\f0\ltrch\lang1033 import Player from '../Player/Player\f1\rtlch\lang1037 ';\par
+\f0\ltrch\lang1033 import \{ deleteAudio, getAudioById, saveAudio, updateAudio \} from '../../../services/Audio.service\f1\rtlch\lang1037 ';\par
+\f0\ltrch\lang1033 import \{ useHistory, useLocation \} from "react-router-dom\f1\rtlch\lang1037 ";\par
+\f0\ltrch\lang1033 import \{ Button \} from 'react-bootstrap\f1\rtlch\lang1037 ';\par
+\f0\ltrch\lang1033 import \{ useSelector, useDispatch \} from "react-redux\f1\rtlch\lang1037 "\par
+\f0\ltrch\lang1033 import \{ actions \} from "../../../redux/actions\f1\rtlch\lang1037 ";\par
+\f0\ltrch\lang1033 import \{ FontAwesomeIcon \} from "@fortawesome/react-fontawesome\f1\rtlch\lang1037 ";\par
+\f0\ltrch\lang1033 import ImgCrop from "./Crop/indexCrop\f1\rtlch\lang1037 ";\par
+\f0\ltrch\lang1033 import './RecordDetails.css\f1\rtlch\lang1037 ';\par
+ \par
+\f0\ltrch\lang1033 function RecordDetails(props)\f1\rtlch\lang1037  \{\par
+\par
+  \f0\ltrch\lang1033 const history = useHistory\f1\rtlch\lang1037 ();\par
+  \f0\ltrch\lang1033 const location = useLocation\f1\rtlch\lang1037 ();\par
+  \f0\ltrch\lang1033 const channelName = useSelector(state => state.site.channelName)\f1\rtlch\lang1037 ;\par
+  \f0\ltrch\lang1033 const userName = useSelector(state => state.user.userName)\f1\rtlch\lang1037 ;\par
+  \f0\ltrch\lang1033 const dispatch = useDispatch\f1\rtlch\lang1037 ();\par
+  \f0\ltrch\lang1033 const [isAdmin, setIsAdmin] = useState(false)\f1\rtlch\lang1037\par
+  \f0\ltrch\lang1033 var includeAdmin = 0\f1\rtlch\lang1037 ;\par
+  \f0\ltrch\lang1033 const [showCropper, setShowCropper] = useState(false)\f1\rtlch\lang1037\par
+  \f0\ltrch\lang1033 const [imgId, setImgId] = useState(null)\f1\rtlch\lang1037\par
+  \f0\ltrch\lang1033 const [editZoom, setEditZoom] = useState\f1\rtlch\lang1037 ()\par
+  \f0\ltrch\lang1033 const [editRotation, setEditRotation] = useState\f1\rtlch\lang1037 ()\par
+  \f0\ltrch\lang1033 const [editImg, setEditImg] = useState\f1\rtlch\lang1037 ()\par
+  \f0\ltrch\lang1033 const [croppedAreaPixels, setCroppedAreaPixels] = useState\f1\rtlch\lang1037 ()\par
+  \f0\ltrch\lang1033 const [crop, setCrop] = useState(\{ x: 0, y: 0 \})\f1\rtlch\lang1037\par
+  \f0\ltrch\lang1033 const [showEditImg, setshowEditImg] = useState(false)\f1\rtlch\lang1037\par
+  \f0\ltrch\lang1033 const [placeIconImg, setPlaceIconImg] = useState\f1\rtlch\lang1037 ("\f0\ltrch\lang1033 40%\f1\rtlch\lang1037 ")\par
+\par
+\par
+  \f0\ltrch\lang1033 function Cb(child, editImg, zoom, rotation, croppedAreaPixels, crop)\f1\rtlch\lang1037  \{\par
+    \f0\ltrch\lang1033 setShowCropper(child)\f1\rtlch\lang1037\par
+    \f0\ltrch\lang1033 setEditImg(editImg)\f1\rtlch\lang1037\par
+    \f0\ltrch\lang1033 setEditZoom(zoom)\f1\rtlch\lang1037\par
+    \f0\ltrch\lang1033 setEditRotation(rotation)\f1\rtlch\lang1037\par
+    \f0\ltrch\lang1033 setCroppedAreaPixels(croppedAreaPixels)\f1\rtlch\lang1037\par
+    \f0\ltrch\lang1033 setCrop(crop)\f1\rtlch\lang1037\par
+    \f0\ltrch\lang1033 console.log('croppedAreaPixels ', croppedAreaPixels)\f1\rtlch\lang1037\par
+    \f0\ltrch\lang1033 console.log('Cb', child)\f1\rtlch\lang1037\par
+  \}\par
+\f0\ltrch\lang1033 function ShowCropperInClose(show)\f1\rtlch\lang1037  \{\par
+  \f0\ltrch\lang1033 setShowCropper(show)\f1\rtlch\lang1037\par
+\}\par
+  \f0\ltrch\lang1033 useEffect\f1\rtlch\lang1037 (() => \{\par
+    \f0\ltrch\lang1033 if (!Object.keys(props.currentAudio).length && props.currentAudio.constructor === Object)\f1\rtlch\lang1037  \{\par
+      \f0\ltrch\lang1033 getAudioById(props._id, (audio\f1\rtlch\lang1037 ) => \{\par
+        \f0\ltrch\lang1033 props.setCurrentAudio(audio)\f1\rtlch\lang1037 ;\par
+      \});\par
+    \}\par
+  \})\par
+\par
+  \f0\ltrch\lang1033 useEffect\f1\rtlch\lang1037 (() => \{\par
+        \f0\ltrch\lang1033 var rout = window.location.href\f1\rtlch\lang1037\par
+    \f0\ltrch\lang1033 includeAdmin = rout.includes('/admin/')\f1\rtlch\lang1037\par
+    \f0\ltrch\lang1033 if (includeAdmin)\f1\rtlch\lang1037\par
+      \f0\ltrch\lang1033 setIsAdmin(true)\f1\rtlch\lang1037\par
+  \}, [])\par
+\par
+  \f0\ltrch\lang1033 const newRecord\f1\rtlch\lang1037  = () => \{\par
+    \f0\ltrch\lang1033 history.push(`/admin/$\{userName\}/$\{channelName\}/AddRecord/false`)\f1\rtlch\lang1037 ;\par
+    \f0\ltrch\lang1033 dispatch(actions.setAudio(\{ audioUrl: '', duration: '00:00' \}))\f1\rtlch\lang1037 ;\par
+  \}\par
+  \f0\ltrch\lang1033 const changeImage = (file)\f1\rtlch\lang1037  => \{\par
+    \f0\ltrch\lang1033 const reader = new FileReader\f1\rtlch\lang1037 ();\par
+    \f0\ltrch\lang1033 if (file)\f1\rtlch\lang1037  \{\par
+      \f0\ltrch\lang1033 reader.readAsDataURL(file)\f1\rtlch\lang1037 ;\par
+      \f0\ltrch\lang1033 reader.onloadend = async\f1\rtlch\lang1037  () => \{\par
+        \f0\ltrch\lang1033 setImgId(reader.result)\f1\rtlch\lang1037\par
+        \f0\ltrch\lang1033 setEditZoom\f1\rtlch\lang1037 (\f0\ltrch\lang1033 1\f1\rtlch\lang1037 )\par
+        \f0\ltrch\lang1033 setEditRotation\f1\rtlch\lang1037 (\f0\ltrch\lang1033 0\f1\rtlch\lang1037 )\par
+        \f0\ltrch\lang1033 setCroppedAreaPixels(null)\f1\rtlch\lang1037\par
+        \f0\ltrch\lang1033 setCrop(\{ x: 0, y: 0 \})\f1\rtlch\lang1037\par
+        \f0\ltrch\lang1033 setShowCropper(true)\f1\rtlch\lang1037\par
+        \f0\ltrch\lang1033 setshowEditImg(true)\f1\rtlch\lang1037\par
+        \f0\ltrch\lang1033 setPlaceIconImg\f1\rtlch\lang1037 ("\f0\ltrch\lang1033 50%\f1\rtlch\lang1037 ")\par
+        \f0\ltrch\lang1033 console.log('img', showCropper)\f1\rtlch\lang1037\par
+      \}\par
+    \}\par
+  \}\par
+  \f0\ltrch\lang1033 const cancleSave\f1\rtlch\lang1037  = () => \{\par
+    \f0\ltrch\lang1033 history.goBack\f1\rtlch\lang1037 ()\par
+  \}\par
+\par
+  \f0\ltrch\lang1033 function EditImg\f1\rtlch\lang1037 () \{\par
+    \f0\ltrch\lang1033 setShowCropper(true)\f1\rtlch\lang1037\par
+   \}\par
+\par
+  \f0\ltrch\lang1033 const handleSave = async\f1\rtlch\lang1037  () => \{\par
+    \f0\ltrch\lang1033 if (!props.currentAudio.img)\f1\rtlch\lang1037  \{\par
+      \f0\ltrch\lang1033 console.log(defaultImgSrc)\f1\rtlch\lang1037 ;\par
+      \f0\ltrch\lang1033 fetch(defaultImgSrc).then(r\f1\rtlch\lang1037  => \{\par
+        \f0\ltrch\lang1033 return r.blob\f1\rtlch\lang1037 ();\par
+      \}).\f0\ltrch\lang1033 then(blobFile\f1\rtlch\lang1037  => \{\par
+        \f0\ltrch\lang1033 let name = 'defaultImgSrc.png\f1\rtlch\lang1037 ';\par
+        \f0\ltrch\lang1033 var fileToUpload = new File([blobFile], name\f1\rtlch\lang1037 , \{\par
+          \f0\ltrch\lang1033 lastModified: new Date().getTime\f1\rtlch\lang1037 (),\par
+          \f0\ltrch\lang1033 type: blobFile.type\f1\rtlch\lang1037 ,\par
+        \});\par
+        \f0\ltrch\lang1033 let imgUrl = URL.createObjectURL(fileToUpload)\f1\rtlch\lang1037 ;\par
+        \f0\ltrch\lang1033 dispatch(actions.changeCurrentAudioImage(imgUrl))\f1\rtlch\lang1037\par
+        \f0\ltrch\lang1033 saveAudio(\{ ...props.currentAudio, img: imgUrl \}, props.dispatchAddRecord, props.userName, history, channelName)\f1\rtlch\lang1037 ;\par
+      \})\par
+    \}\par
+    \f0\ltrch\lang1033 else saveAudio(props.currentAudio, props.dispatchAddRecord, props.userName, history, channelName)\f1\rtlch\lang1037 ;\par
+  \}\par
+\par
+  \f0\ltrch\lang1033 const handleUpdate\f1\rtlch\lang1037  = () => \{\par
+    \f0\ltrch\lang1033 updateAudio(props.dispatchUpdateAudio, props.currentAudio, props.audio, history, props.userName)\f1\rtlch\lang1037 ;\par
+  \}\par
+\par
+  \f0\ltrch\lang1033 const handleDelete\f1\rtlch\lang1037  = () => \{\par
+    \f0\ltrch\lang1033 deleteAudio(props.dispatchDeleteAudio, props.currentAudio._id, props.userName)\f1\rtlch\lang1037 ;\par
+    \f0\ltrch\lang1033 history.goBack\f1\rtlch\lang1037 ();\par
+  \}\par
+\par
+  \f0\ltrch\lang1033 const audio = props.currentAudio\f1\rtlch\lang1037  || \{\};\par
+  \f0\ltrch\lang1033 useEffect\f1\rtlch\lang1037 (() => \{\par
+    // \f0\ltrch\lang1033 window.addEventListener("beforeunload", (e\f1\rtlch\lang1037 ) => \{\par
+    //   \f0\ltrch\lang1033 e.preventDefault\f1\rtlch\lang1037 ();\par
+    //   \f0\ltrch\lang1033 if (window.location.pathname.includes("/admin/"))\f1\rtlch\lang1037\par
+    //     \f0\ltrch\lang1033 return (e.returnValue = "Are you sure you want to close?")\f1\rtlch\lang1037 ;\par
+    // \});\par
+    \f0\ltrch\lang1033 window.addEventListener('beforeunload', alertUser)\f1\rtlch\lang1037\par
+    \f0\ltrch\lang1033 window.addEventListener('unload', ()=>alert("aaaaaaaaaaaaaaaaaaaaaa"))\f1\rtlch\lang1037\par
+    \f0\ltrch\lang1033 return\f1\rtlch\lang1037  () => \{\par
+      \f0\ltrch\lang1033 window.removeEventListener('beforeunload', alertUser)\f1\rtlch\lang1037\par
+      \f0\ltrch\lang1033 window.removeEventListener('unload',()=>alert("aaaaaaaaaaaaaaaaaaaaaa"))\f1\rtlch\lang1037\par
+    \}\par
+  \}, []);\par
+\par
+  \f0\ltrch\lang1033 const alertUser = (e)\f1\rtlch\lang1037  => \{\par
+    \f0\ltrch\lang1033 e.preventDefault\f1\rtlch\lang1037 ();\par
+    \f0\ltrch\lang1033 e.returnValue\f1\rtlch\lang1037  = "";\par
+  \};\par
+  \f0\ltrch\lang1033 return\f1\rtlch\lang1037  (\par
+    <>\par
+      <\f0\ltrch\lang1033 div className="wrapRecordView\f1\rtlch\lang1037 ">\par
+        \{\f0\ltrch\lang1033 showCropper && <ImgCrop id=\{imgId\} source="singleAudio" ShowCropperInClose=\{ShowCropperInClose\} zoom=\{editZoom\} rotation=\{editRotation\} croppedAreaPixels=\{croppedAreaPixels\} crop=\{crop\} Cb=\{Cb\} changeImage=\{changeImage\}\f1\rtlch\lang1037  />\}\par
+        \{\par
+          \f0\ltrch\lang1033 isAdmin && !showCropper\f1\rtlch\lang1037  ?\par
+            <>\par
+              <\f0\ltrch\lang1033 div className="currentAudioUploadImgOnHover\f1\rtlch\lang1037 " >\par
+                 <\f0\ltrch\lang1033 img src=\{audio.img || defaultImgSrc\} id="img_homeImg" className="divUploadImage" alt="homeImage\f1\rtlch\lang1037 " />\par
+                <\f0\ltrch\lang1033 div className="iconDiv\f1\rtlch\lang1037 ">\par
+                  <\f0\ltrch\lang1033 input type="file" name="file" accept="image/*" id=\{`currentAudioImgFile`\} className="inputfile" onChange=\{(e) => changeImage(e.target.files[0])\}\f1\rtlch\lang1037  />\par
+                  <\f0\ltrch\lang1033 label htmlFor=\{`currentAudioImgFile`\} className="d-inline-flex d-flex justify-content-center align-items-center" style=\{\{ width: "100%", paddingBottom: "0PX" \}\}\f1\rtlch\lang1037 >\par
+                    <\f0\ltrch\lang1033 div style=\{\{right:placeIconImg\}\} className=" wrapIconUpload\f1\rtlch\lang1037  ">\par
+                      <\f0\ltrch\lang1033 FontAwesomeIcon\f1\rtlch\lang1037\par
+                        \f0\ltrch\lang1033 id='angle-right\f1\rtlch\lang1037 '\par
+                        \f0\ltrch\lang1033 className='iconCloudUploadForCurrentAudio\f1\rtlch\lang1037 '\par
+                        \f0\ltrch\lang1033 icon=\{['fas', 'cloud-upload-alt']\}\f1\rtlch\lang1037\par
+                      ></\f0\ltrch\lang1033 FontAwesomeIcon\f1\rtlch\lang1037 >\par
+                      <\f0\ltrch\lang1033 p className="textUploadImg">Upload an image</p\f1\rtlch\lang1037 >\par
+                    </\f0\ltrch\lang1033 div\f1\rtlch\lang1037 >\par
+                  </\f0\ltrch\lang1033 label\f1\rtlch\lang1037 >\par
+                  \{\f0\ltrch\lang1033 showEditImg && <div className="wrapIconEdit\f1\rtlch\lang1037 ">\par
+                    <\f0\ltrch\lang1033 FontAwesomeIcon\f1\rtlch\lang1037\par
+                      \f0\ltrch\lang1033 id='image\f1\rtlch\lang1037 '\par
+                      \f0\ltrch\lang1033 className='iconCloudUploadForCurrentAudio\f1\rtlch\lang1037 '\par
+                      \f0\ltrch\lang1033 icon=\{['fas', 'image']\}\f1\rtlch\lang1037\par
+                      \f0\ltrch\lang1033 onClick=\{EditImg\}\f1\rtlch\lang1037\par
+                    ></\f0\ltrch\lang1033 FontAwesomeIcon\f1\rtlch\lang1037 >\par
+                    <\f0\ltrch\lang1033 p className="textUploadImg">Edit Image</p\f1\rtlch\lang1037 >\par
+                  </\f0\ltrch\lang1033 div\f1\rtlch\lang1037 >\}\par
+                </\f0\ltrch\lang1033 div\f1\rtlch\lang1037 >\par
+              </\f0\ltrch\lang1033 div\f1\rtlch\lang1037 >\par
+\par
+            </>\par
+            :\par
+            \f0\ltrch\lang1033 audio._id && !showCropper && <BackgroundColor imgSrc=\{audio.img || defaultImgSrc\}\f1\rtlch\lang1037  />\par
+        \}\par
+\par
+\par
+       \{ !\f0\ltrch\lang1033 showCropper && <div className="recordPlayer\f1\rtlch\lang1037 ">\par
+          <\f0\ltrch\lang1033 Player autoPlayPlayer=\{false\} pause=\{true\}  audio=\{audio\}\f1\rtlch\lang1037 />\par
+           \{/* <\f0\ltrch\lang1033 Button style=\{\{ backgroundColor: "#4B0083" \}\} onClick=\{newRecord\}>New record</Button\f1\rtlch\lang1037 > */\}\par
+        </\f0\ltrch\lang1033 div\f1\rtlch\lang1037 >\}\par
+        <\f0\ltrch\lang1033 div className="wrap_recordDetails\f1\rtlch\lang1037 ">\par
+        \{ !\f0\ltrch\lang1033 showCropper && <div className="wrap_createDate\f1\rtlch\lang1037 ">\par
+            <\f0\ltrch\lang1033 CreateDateViewsCommentsWithIcons\f1\rtlch\lang1037\par
+              \f0\ltrch\lang1033 createDate=\{audio.createDate\}\f1\rtlch\lang1037\par
+              \f0\ltrch\lang1033 views=\{audio.counterViews\}\f1\rtlch\lang1037\par
+            />\par
+          </\f0\ltrch\lang1033 div\f1\rtlch\lang1037 >\}\par
+          <\f0\ltrch\lang1033 div className="textDetails\f1\rtlch\lang1037 ">\par
+            \{\f0\ltrch\lang1033 isAdmin && !showCropper\f1\rtlch\lang1037   ?\par
+              <>\par
+              <\f0\ltrch\lang1033 div className="p-8\f1\rtlch\lang1037 ">\par
+              <\f0\ltrch\lang1033 textarea className="titleInput inputNoneDisplay edit" rows="1" placeholder="Insert your text here!" value=\{audio.title\} onChange=\{(e) => props.setCurrentAudioByFieldName('title', e.target.value)\}\f1\rtlch\lang1037  />\par
+              </\f0\ltrch\lang1033 div\f1\rtlch\lang1037 >\par
+              <\f0\ltrch\lang1033 br\f1\rtlch\lang1037 />\par
+              <\f0\ltrch\lang1033 div className="p-8\f1\rtlch\lang1037 ">\par
+              <\f0\ltrch\lang1033 textarea className="descriptionInput inputNoneDisplay edit" placeholder="Write Stories About Your Business And Use Them To Engage Your Customers\f2\lang1037\'85 \f0\lang1033 Your Stories Blog Can Be Shared On Your Website, On Social Media, Or Sent Via Email As A Company Newsletter. You Can Add Your Own Images Or Choose From Our Image Library. Use The Form To Invite People To Sign Up To Receive Further Updates Or Your Company Newsletter. You Can Customize This Sign-Up Form In Form Settings. Write Stories About Your Business And Use Them To Engage Your Customers. Your Stories Blog Can Be Shared On Your Website, On Social Media, Or Sent Via Email As A Company Newsletter. You Can Add Your Own Images Or Choose From Our Image Library. Use The Form To Invite People To Sign Up To Receive Further Updates Or Your Company Newsletter. You Can Customize This Sign-Up Form In Form Settings. Write Stories About Your Business And Use Them To Engage Your Customers\f2\lang1037\'85 \f0\lang1033 Your Stories Blog Can Be Shared On Your Website, On Social Media, Or Sent Via Email As A Company Newsletter. You Can Add Your Own Images Or Choose From Our Image Library. Use The Form To Invite People To Sign Up To Receive Further Updates Or Your Company Newsletter. You Can Customize This Sign-Up Form In Form Settings. Write Stories About Your Business And Use Them To Engage Your Customers. Your Stories Blog Can Be Shared On Your Website, On Social Media, Or Sent Via Email As A Company Newsletter. You Can Add Your Own Images Or Choose From Our Image Library. Use The Form To Invite People To Sign Up To Receive Further Updates Or Your Company Newsletter. You Can Customize This Sign-Up Form In Form Settings." value=\{audio.description\} onChange=\{(e) => props.setCurrentAudioByFieldName('description', e.target.value)\}\f1\rtlch\lang1037  />\par
+              </\f0\ltrch\lang1033 div\f1\rtlch\lang1037 >\par
+            \par
+              </>\par
+              :\par
+              !\f0\ltrch\lang1033 showCropper\f1\rtlch\lang1037  && <>\par
+                <\f0\ltrch\lang1033 h4>\{audio.title\}</h4\f1\rtlch\lang1037 >\par
+                <\f0\ltrch\lang1033 p>\{audio.description\}</p\f1\rtlch\lang1037 >\par
+              </>\par
+            \}\par
+            \{\par
+            !\f0\ltrch\lang1033 showCropper &&  isAdmin && audio._id\f1\rtlch\lang1037  ?\par
+                <\f0\ltrch\lang1033 div\f1\rtlch\lang1037 >\par
+                  <\f0\ltrch\lang1033 Button\f1\rtlch\lang1037\par
+                    \f0\ltrch\lang1033 className="editButton\f1\rtlch\lang1037 "\par
+                    \f0\ltrch\lang1033 onClick=\{handleDelete\}\f1\rtlch\lang1037\par
+                  >\f0\ltrch\lang1033 Delete</Button\f1\rtlch\lang1037 >\par
+                  <\f0\ltrch\lang1033 Button\f1\rtlch\lang1037\par
+                    \f0\ltrch\lang1033 className="editButton\f1\rtlch\lang1037 "\par
+                    \f0\ltrch\lang1033 onClick=\{handleUpdate\}\f1\rtlch\lang1037\par
+                  >\f0\ltrch\lang1033 Update</Button\f1\rtlch\lang1037 >\par
+                  <\f0\ltrch\lang1033 Button\f1\rtlch\lang1037\par
+                    \f0\ltrch\lang1033 className="editButton\f1\rtlch\lang1037 "\par
+                    \f0\ltrch\lang1033 onClick=\{cancleSave\}\f1\rtlch\lang1037\par
+                  >\f0\ltrch\lang1033 Cancle</Button\f1\rtlch\lang1037 >\par
+                </\f0\ltrch\lang1033 div\f1\rtlch\lang1037 >\par
+                : !\f0\ltrch\lang1033 showCropper && isAdmin\f1\rtlch\lang1037  ?\par
+                  <>\par
+                    <\f0\ltrch\lang1033 Button\f1\rtlch\lang1037\par
+                      \f0\ltrch\lang1033 className="editButton\f1\rtlch\lang1037 "\par
+                      \f0\ltrch\lang1033 onClick=\{handleSave\}\f1\rtlch\lang1037\par
+                    >\f0\ltrch\lang1033 Save</Button\f1\rtlch\lang1037 >\par
+                    <\f0\ltrch\lang1033 Button\f1\rtlch\lang1037\par
+                      \f0\ltrch\lang1033 className="editButton\f1\rtlch\lang1037 "\par
+                      \f0\ltrch\lang1033 onClick=\{cancleSave\}\f1\rtlch\lang1037\par
+                    >\f0\ltrch\lang1033 Cancle</Button\f1\rtlch\lang1037 >\par
+                  </>\par
+                  : ""\par
+            \}\par
+          </\f0\ltrch\lang1033 div\f1\rtlch\lang1037 >\par
+        </\f0\ltrch\lang1033 div\f1\rtlch\lang1037 >\par
+      </\f0\ltrch\lang1033 div\f1\rtlch\lang1037 >\par
+\par
+    </>\par
+  );\par
+\}\par
+\par
+\f0\ltrch\lang1033 const mapStateToProps = (r_state, ownProps)\f1\rtlch\lang1037  => \{\par
+  \f0\ltrch\lang1033 return\f1\rtlch\lang1037  \{\par
+    \f0\ltrch\lang1033 audio: r_state.audio.audioList.filter((a) => a._id === ownProps._id)\f1\rtlch\lang1037 [\f0\ltrch\lang1033 0\f1\rtlch\lang1037 ],\par
+    \f0\ltrch\lang1033 currentAudio: r_state.audio.currentAudio\f1\rtlch\lang1037 ,\par
+    \f0\ltrch\lang1033 userName: r_state.user.userName\f1\rtlch\lang1037\par
+  \};\par
+\};\par
+\par
+\f0\ltrch\lang1033 const mapDispatchToProps = (dispatch, ownProps)\f1\rtlch\lang1037  => (\{\par
+  \f0\ltrch\lang1033 setCurrentAudio: (audio) => dispatch(actions.setCurrentAudio(audio))\f1\rtlch\lang1037 ,\par
+  \f0\ltrch\lang1033 setCurrentAudioByFieldName: (key, value) => dispatch(actions.setCurrentAudioByFieldName(\{ key: key, value: value \}))\f1\rtlch\lang1037 ,\par
+  \f0\ltrch\lang1033 dispatchAddRecord: (audio) => dispatch(actions.saveAudio(audio))\f1\rtlch\lang1037 ,\par
+  \f0\ltrch\lang1033 dispatchUpdateAudio: (audio) => dispatch(actions.updateAudio(audio))\f1\rtlch\lang1037 ,\par
+  \f0\ltrch\lang1033 dispatchDeleteAudio: (audio) => dispatch(actions.deleteAudio(audio))\f1\rtlch\lang1037\par
+\})\par
+\par
+\f0\ltrch\lang1033 export default connect(mapStateToProps, mapDispatchToProps)(RecordDetails)\f1\rtlch\lang1037 ;\par
+}
+ 
